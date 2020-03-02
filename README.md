@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # todolist
 
 > vue.js todolist project
@@ -19,3 +20,7 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+=======
+# Vue.js-Todo-App-by-Codes
+Vue.js Todo App 실습
+>>>>>>> bb2c2d3dce29ccfad2ae131998aaefd46722dd20
