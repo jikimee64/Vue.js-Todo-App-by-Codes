@@ -19,7 +19,10 @@
 				v-focus
 			/>
 		</div>
-		<div class="remove-item" @click="removeTodo(index)">&times;</div>
+		<div>
+			<button @click="pluralize">Plural</button>
+			<span class="remove-item" @click="removeTodo(index)">&times;</span>
+		</div>
 	</div>
 </template>
 
@@ -50,6 +53,12 @@ export default {
 			'beforeEditCache': '',
 		}
 	},
+	created() {
+		eventBus.$on('pluralize', this.handlePluralize)
+	},
+	beforeDestroy() {
+		eventBus.$off('pluralize', this.handlePluralize)
+	},
 	watch: {
 		checkAll() {
 			// if (this.checkAll) {
@@ -69,19 +78,19 @@ export default {
 	},
 	methods: {
 		removeTodo(index) {
-			this.$emit('removedTodo', index)
+			eventBus.$emit('removedTodo', index)
 		},
 		editTodo() {
 			this.beforeEditCache = this.title
 			this.editing = true
 		},
-		doneEdit(tdo) {
+		doneEdit() {
 			//수정시 공백 X
 			if (this.title.trim() == '') {
 				this.title = this.beforeEditCache
 			}
 			this.editing = false;
-			this.$emit('finishedEdit', {
+			eventBus.$emit('finishedEdit', {
 				'index': this.index,
 				'todo': {
 					'id': this.id,
@@ -96,6 +105,12 @@ export default {
 			this.title = this.beforeEditCache
 			this.editing = false;
 		},
+		pluralize() {
+			eventBus.$emit('pluralize')
+		},
+		handlePluralize() {
+			this.title = this.title + 's'
+		}
 	}
 }
 </script>
