@@ -14,29 +14,13 @@
 		>
 			<!-- keyup.enter : 엔터를 눌렀다 뗄 때 반응 -->
 			<!-- blur: 엘리먼트의 포커스가 해제되었을때 발생 -->
-			<div v-for="(todo, index) in todosFiltered" :key="todo.id" class="todo-item">
-				<div class="todo-item-left">
-					<input type="checkbox" v-model="todo.completed" />
-					<div
-						v-if="!todo.editing"
-						@dblclick="editTodo(todo)"
-						class="todo-item-label"
-						:class="{completed : todo.completed}"
-					>{{todo.title}}</div>
-					<input
-						v-else
-						class="todo-item-edit"
-						type="text"
-						v-model="todo.title"
-						@blur="doneEdit(todo)"
-						@keyup.enter="doneEdit(todo)"
-						@keyup.esc="cancelEdit(todo)"
-						v-focus
-					/>
-					<div class="remove-item" @click="removeTodo(index)">&times;</div>
-				</div>
-			</div>
+			<!-- TodoItem 컴포넌트에 todo와 index를 전달 -->
+			<todo-item v-for="(todo, index) in todosFiltered" :key="todo.id" 
+			:todo="todo" :index="index" :checkAll="!anyRemaining" @removedTodo="removeTodo" @finishedEdit="finishedEdit"></todo-item>
 		</transition-group>
+
+		
+
 		<div class="extra-container">
 			<div>
 				<label>
@@ -62,8 +46,12 @@
 </template>
 
 <script>
+import TodoItem from './TodoItem'
 export default {
 	name: 'todo-list',
+	components: {
+		TodoItem,
+	},
 	data() {
 		return {
 			newTodo: '',
@@ -108,13 +96,6 @@ export default {
 			return this.todos.filter(todo => todo.completed).length > 0
 		}
 	},
-	directives: { //v-focus로 실행, vue 가이드에 있음
-		focus: {
-			inserted: function (el) {
-				el.focus()
-			}
-		}
-	},
 	methods: {
 		addTodo() {
 			//공백 허용 X
@@ -131,21 +112,6 @@ export default {
 			this.newTodo = ''
 			this.idForTodo++
 		},
-		editTodo(todo) {
-			this.beforeEditCache = todo.title
-			todo.editing = true;
-		},
-		doneEdit(todo) {
-			//수정시 공백 X
-			if (todo.title.trim() == '') {
-				todo.title = this.beforeEditCache
-			}
-			todo.editing = false;
-		},
-		cancelEdit(todo) {
-			todo.title = this.beforeEditCache
-			todo.editing = false;
-		},
 		removeTodo(index) {
 			//index 배열부터 1개 제거
 			this.todos.splice(index, 1);
@@ -156,6 +122,9 @@ export default {
 		},
 		clearCompleted() {
 			this.todos = this.todos.filter(todo => !todo.completed)
+		},
+		finishedEdit(data){
+			this.todos.splice(data.index, 1, data.todo)
 		}
 	}
 }
@@ -179,7 +148,7 @@ export default {
 	align-items: center;
 	justify-content: space-between;
 	font-size: 24px;
-    animation-duration: 0.3s;
+	animation-duration: 0.3s;
 }
 .remove-item {
 	cursor: pointer;
